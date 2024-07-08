@@ -1,4 +1,5 @@
 // this is to display L3 Discount popup on completion of L2 Catering
+// Editing sfwd-lms/themes/legacy/templates/quiz/partials/show_quiz_result_box.php (active)
 
 <?php
 /**
@@ -157,15 +158,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	if ( is_user_logged_in() ) {
 		
-$user = wp_get_current_user();
-$comp = learndash_course_completed( $user->ID, 2396 );
-if($comp) { ?>	
+//$user = wp_get_current_user();
+//$comp = learndash_user_quiz_has_completed( $user->ID, 3183 , 2396 );
+//$quiz_complete = learndash_get_latest_quiz_results(3183, $user->ID ); ?>
+
+		<div class="wpProQuiz_certificate" style="display: none ;">
+			<?php echo LD_QuizPro::certificate_link( '', $quiz ); ?>
+<?php			
+if( learndash_get_quiz_id(3183) ) { ?>	
 	<div class="shop_close_overlay">
 		<div class="shop_close_overlay_text_on_image" style="">
 			<div class="shop_close_cross"><i class="fa fa-times-circle" aria-hidden="true"></i></div>
 			<div class="text_on_image_bottom">
 				<img src="/wp-content/uploads/2024/06/party-popper.png" class="" style="width: 50px;" />
-				<h2 style="font-weight: 700; color: #4184bf; margin-bottom: 20px;">Congratulations</h2>
+				<h2 style="font-weight: 700; color: #4184bf; margin-bottom: 20px;">Congratulations</h2>				
 				<p>For a limited time, we’re pleased to provide you with a discounted price of <strong>£55</strong> for the <strong>Level 3</strong> course, allowing you to save <strong>£15</strong>!</p>
 				<p>Use the coupon code <strong>UPSKILL15</strong> during checkout to get this exclusive offer.</p>
 			</div>
@@ -259,8 +265,8 @@ if($comp) { ?>
 	</script>	
 	
 <?php } ?>	
-		
-		<p class="wpProQuiz_certificate" style="display: none ;"><?php echo LD_QuizPro::certificate_link( '', $quiz ); ?></p>
+			
+		</div>
 		<?php echo LD_QuizPro::certificate_details( $quiz ); ?>
 		<?php
 	}
