@@ -113,7 +113,7 @@ public function remove_group_user_for_renew_course( $user_id, $group_id ) {
 					if ( '' != $user_id && '' != $group_id ) {
 						$ldgr_admin_approval = get_option( 'ldgr_admin_approval' );
 
-							$response = $this->ldgr_remove_user_from_group( $user_id, $group_id );
+							$response = $this->ldgr_remove_user_from_group_renew_course( $user_id, $group_id );
 							if ( $response ) {
 								return array( 'success' => __( 'User removed from the Group Successfully', 'wdm_ld_group' ) );
 							} else {
@@ -179,6 +179,44 @@ public function handle_renew_course() {
 			die();
 		}
 
+
+public function ldgr_remove_user_from_group_renew_course( $user_id, $group_id ) {
+			$group_limit       = get_post_meta( $group_id, 'wdm_group_users_limit_' . $group_id, true );
+			$total_group_limit = get_post_meta( $group_id, 'wdm_group_total_users_limit_' . $group_id, true );
+
+			// Check if If total group limit set.
+			if ( empty( $total_group_limit ) || '' === $total_group_limit ) {
+				$total_group_limit = -1;
+			}
+
+			if ( '' == $group_limit ) {
+				$group_limit = 0;
+			}
+
+			// If the restrict group limit setting is not enabled, then increase group limit on user removal.
+			$ldgr_group_limit = get_option( 'ldgr_group_limit' );
+			if ( 'on' !== $ldgr_group_limit ) {
+				// Check if group limit does not exceed total group limit.
+				if ( $total_group_limit < 0 || $group_limit < $total_group_limit ) {
+					$group_limit = ++$group_limit;
+					update_post_meta( $group_id, 'wdm_group_users_limit_' . $group_id, $group_limit );
+				}
+			} else {
+				// If fixed group limit is enabled, reduce 1 from total seats.
+				$total_group_limit--;
+				update_post_meta( $group_id, 'wdm_group_total_users_limit_' . $group_id, $total_group_limit );
+			}
+
+			$ldgr_admin_approval   = get_option( 'ldgr_admin_approval' );
+			$wdm_gr_gl_rmvl_enable = get_option( 'wdm_gr_gl_rmvl_enable' );
+
+			if ( $ldgr_admin_approval != 'on' && 'off' != $wdm_gr_gl_rmvl_enable ) {}
+
+			ld_update_group_access( $user_id, $group_id, true );
+			do_action( 'wdm_removal_request_accepted_successfully', $group_id, $user_id );
+
+			return true;
+		}
 
 
 /// Editing ld-group-registration/includes/class-ld-group-registration.php (active)
