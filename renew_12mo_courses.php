@@ -72,12 +72,13 @@ jQuery('body').on('click', '.wdm_renew_course', function (e) {
                             case 'success':
                                 snackbar(message);
                                 if (wdm_data.admin_approve == 'on') {
-                                    jQuery('#wdm_search_submit').trigger('submit');
-                                }
-                                else {
-                                    temp.removeClass('wdm_remove');
+									temp.removeClass('wdm_remove');
                                     temp.addClass('request_sent');
                                     temp.text(wdm_data.request_sent);
+                                    
+                                }
+                                else {
+                                    jQuery('#wdm_search_submit').trigger('submit');
                                 }
 
                                 break;
@@ -100,6 +101,38 @@ jQuery('body').on('click', '.wdm_renew_course', function (e) {
 
 /// Editing ld-group-registration/modules/classes/class-ld-group-registration-groups.php (active)
 
+public function remove_group_user_for_renew_course( $user_id, $group_id ) {
+			if ( is_user_logged_in() ) {
+				if ( learndash_is_group_leader_user( get_current_user_id() ) || learndash_is_group_leader_user( get_current_user_id() ) || current_user_can( 'manage_options' ) ) {
+					$admin_group_ids = learndash_get_administrators_group_ids( get_current_user_id() );
+
+					if ( ! in_array( $group_id, $admin_group_ids ) ) {
+						return array( 'error' => __( 'You are not the owner of this group', 'wdm_ld_group' ) );
+					}
+
+					if ( '' != $user_id && '' != $group_id ) {
+						$ldgr_admin_approval = get_option( 'ldgr_admin_approval' );
+
+							$response = $this->ldgr_remove_user_from_group( $user_id, $group_id );
+							if ( $response ) {
+								return array( 'success' => __( 'User removed from the Group Successfully', 'wdm_ld_group' ) );
+							} else {
+								return array( 'error' => __( 'Oops Something went wrong', 'wdm_ld_group' ) );
+							}
+							// die();.
+					} else {
+						return array( 'error' => __( 'Oops Something went wrong', 'wdm_ld_group' ) );
+						// die();
+					}
+				} else {
+					return array( 'error' => __( "You don't have privilege to do this action", 'wdm_ld_group' ) );
+				}
+			} else {
+				return array( 'error' => __( "You don't have privilege to do this action", 'wdm_ld_group' ) );
+			}
+			return array();
+		}
+
 public function handle_renew_course() {
 			check_ajax_referer( 'ldgr_nonce_renew_course', 'nonce' );
 
@@ -109,7 +142,7 @@ public function handle_renew_course() {
 			
 			learndash_delete_course_progress($course_id,  $user_id );
 
-			echo wp_json_encode( $this->remove_group_user( $user_id, $group_id ) );
+			echo wp_json_encode( $this->remove_group_user_for_renew_course( $user_id, $group_id ) );
 			
 			ld_update_group_access( $user_id,  $group_id );
 			
