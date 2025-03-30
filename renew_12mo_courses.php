@@ -115,7 +115,7 @@ public function remove_group_user_for_renew_course( $user_id, $group_id ) {
 
 							$response = $this->ldgr_remove_user_from_group_renew_course( $user_id, $group_id );
 							if ( $response ) {
-								return array( 'success' => __( 'User removed from the Group Successfully', 'wdm_ld_group' ) );
+								return array( 'success' => __( 'User Renewed Course Successfully', 'wdm_ld_group' ) );
 							} else {
 								return array( 'error' => __( 'Oops Something went wrong', 'wdm_ld_group' ) );
 							}
